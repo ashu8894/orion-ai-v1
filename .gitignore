@@ -1,0 +1,41 @@
+# Node modules
+node_modules/
+
+# Environment variables
+.env
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS/macOS system files
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# macOS metadata files
+Icon?
+._*
+.Spotlight-V100
+.Trashes
+.fseventsd
+
+# IDE/editor settings
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# Optional: ignore build/dist folders
+dist/
+build/
+
+# Optional: ignore coverage reports
+coverage/
+
+# Optional: ignore local data files
+*.sqlite
+*.db
