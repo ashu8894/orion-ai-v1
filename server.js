@@ -162,7 +162,7 @@ app.get('/thread', (req, res) => {
 app.post('/message', async (req, res) => {
   const { message, threadId } = req.body;
 
-  const finalThreadId = threadId || "thread_cm4IJwzdmDBAZ6nXy5f34wFw";
+  const finalThreadId = threadId || "thread_QFPJ2QeyhEkfpG7W3d6PsOpq";
 
   try {
     await addMessage(finalThreadId, message);
