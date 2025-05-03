@@ -2,7 +2,8 @@ require("dotenv").config();
 const OpenAI = require('openai');
 const express = require('express');
 const cors = require('cors');
-const { OPENAI_API_KEY, ASSISTANT_ID, SERPAPI_KEY } = process.env;
+const axios = require('axios');
+const { OPENAI_API_KEY, ASSISTANT_ID, SERPAPI_KEY, PERPLEXITY_API_KEY} = process.env;
 
 // + Addition for function calling
 const { getJson } = require("serpapi");
@@ -39,6 +40,44 @@ async function getSearchResult(query) {
 
     return json["organic_results"];
 }
+
+async function getPerplexityAnswer(query) {
+  const url = 'https://api.perplexity.ai/chat/completions';
+
+  const data = {
+  model: 'sonar-pro',
+  messages: [
+    {
+      role: 'system',
+      content: `Always perform a web search using the latest data sources before answering. 
+Never rely on your own memory or training data. Your priority is to fetch and return fresh, real-time information from the web.`
+    },
+    {
+      role: 'user',
+      content: query
+    }
+  ]
+};
+
+
+  try {
+    const response = await axios.post(url, data, {
+      headers: {
+        'accept': 'application/json',
+        'content-type': 'application/json',
+        'Authorization': `Bearer ${PERPLEXITY_API_KEY}`
+      }
+    });
+
+    const assistantReply = response.data.choices?.[0]?.message?.content;
+    return assistantReply || 'No response from assistant.';
+  } catch (error) {
+    console.error('Error:', error.response?.data || error.message);
+    return 'Something went wrong.';
+  }
+}
+
+
 
 // Set up a Thread
 async function createThread() {
@@ -98,14 +137,15 @@ async function checkAndHandleRunStatus(res, threadId, runId) {
         }
         console.log('Function requires query:', query);
 
-        const searchResults = await getSearchResult(query);
-        const toolOutput = JSON.stringify(searchResults || []);
+        const searchResults = await getPerplexityAnswer(query);
+        // const toolOutput = JSON.stringify(searchResults || []);
+        console.log(searchResults);
 
         await openai.beta.threads.runs.submitToolOutputs(threadId, runId, {
           tool_outputs: [
             {
               tool_call_id: toolCalls[0].id,
-              output: toolOutput,
+              output: searchResults,
             },
           ],
         });
